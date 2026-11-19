@@ -113,7 +113,7 @@ export function construireModele(tables, aujourdhui = new Date(), seuilJours = 3
       heure: texte(a.Heure_cloture),
     }));
 
-  return { themes, besoinsParTheme, lignes: lignesPanorama, appels, textes };
+  return { themes, themesTotal: (T.Themes ?? []).length, besoinsParTheme, lignes: lignesPanorama, appels, textes };
 }
 
 // ---------- Dates ----------

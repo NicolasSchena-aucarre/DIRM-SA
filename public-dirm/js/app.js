@@ -42,6 +42,7 @@ async function charger() {
   const lues = await Promise.all(CONFIG.tables.map(async (t) => [t, await window.grist.docApi.fetchTable(t)]));
   for (const [nom, t] of lues) tables[nom] = t;
   M = construireModele(tables, new Date(), CONFIG.seuilClotureJours, CONFIG.organismesNonAffiches);
+  if (!M.themes.length) console.warn(`Widget public : aucun thème publié (${M.themesTotal} thème(s) dans le document). Cochez « Publie » sur au moins un thème de la table Themes.`);
 }
 
 // ---------- Éléments communs ----------
@@ -71,7 +72,7 @@ function rendreThemes() {
   const panneau = $("panneau-themes");
   vider(panneau);
   if (!M.themes.length) {
-    $("compte-themes").textContent = "Aucun thème n’est publié pour l’instant.";
+    panneau.append(h("p", { class: "pub-mention" }, "Aucun thème n’est publié pour le moment."));
     return;
   }
   const liste = h("div", { class: "pub-cases" }, M.themes.map((t) => caseACocher(`th-${t.id}`, t.Nom, etat.themes.has(t.id), (coche) => surTheme(t.id, coche))));
@@ -95,6 +96,10 @@ function surTousThemes(coche) {
 }
 
 function majThemes() {
+  if (!M.themes.length) {
+    $("compte-themes").textContent = "Aucun thème disponible";
+    return;
+  }
   const n = etat.themes.size;
   $("compte-themes").textContent = n ? pluriel(n, "thème sélectionné", "thèmes sélectionnés") : "Sélectionnez un ou plusieurs thèmes";
   const tous = $("th-tous");
