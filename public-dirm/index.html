@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Financements mobilisables – DSF Sud-Atlantique</title>
+<link rel="stylesheet" href="dsfr/core/core.min.css">
+<link rel="stylesheet" href="dsfr/component/button/button.min.css">
+<link rel="stylesheet" href="dsfr/component/link/link.min.css">
+<link rel="stylesheet" href="dsfr/component/badge/badge.min.css">
+<link rel="stylesheet" href="dsfr/component/tag/tag.min.css">
+<link rel="stylesheet" href="dsfr/component/alert/alert.min.css">
+<link rel="stylesheet" href="dsfr/component/callout/callout.min.css">
+<link rel="stylesheet" href="dsfr/component/checkbox/checkbox.min.css">
+<link rel="stylesheet" href="dsfr/component/table/table.min.css">
+<link rel="stylesheet" href="css/public.css">
+</head>
+<body>
+<div class="pub" id="pub">
+  <header class="pub-entete">
+    <img class="pub-logo pub-logo--marianne" src="assets/bloc-marianne.svg" width="178" height="65" alt="République française">
+    <img class="pub-logo pub-logo--dsf" src="assets/logo-dsf.png" width="240" height="100" alt="Document stratégique de façade Sud-Atlantique">
+  </header>
+
+  <main id="contenu" tabindex="-1">
+    <h1 class="pub-titre fr-h2">Financements mobilisables pour la mise en œuvre du plan d’action du DSF Sud-Atlantique</h1>
+    <div id="vue-principale">
+      <p class="pub-chapo">Choisissez les fiches thématiques qui concernent votre projet, puis vos besoins&nbsp;: les financements et appels à projets correspondants s’affichent sous le formulaire.</p>
+
+      <div id="erreurs" role="alert"></div>
+      <div id="avert"></div>
+
+      <section class="pub-bloc" aria-labelledby="t-themes">
+        <span class="pub-etape">Étape 1 sur 3</span>
+        <h2 class="pub-bloc__titre fr-h4" id="t-themes">Quel(s) thème(s) vous intéresse(nt)&#8239;?</h2>
+        <p class="pub-aide-texte">Plusieurs choix possibles.</p>
+        <details class="pub-liste" id="liste-themes" open>
+          <summary><span class="pub-liste__compte" id="compte-themes">Chargement…</span><span class="fr-icon-arrow-down-s-line pub-chevron" aria-hidden="true"></span></summary>
+          <div class="pub-liste__panneau" id="panneau-themes"></div>
+        </details>
+        <ul class="fr-tags-group pub-tags" id="tags-themes"></ul>
+        <div class="pub-presentations" id="presentations"></div>
+      </section>
+
+      <section class="pub-bloc" aria-labelledby="t-besoins">
+        <span class="pub-etape">Étape 2 sur 3</span>
+        <h2 class="pub-bloc__titre fr-h4" id="t-besoins">Quels sont vos besoins&#8239;?</h2>
+        <p class="pub-aide-texte" id="aide-besoins">Sélectionnez d’abord au moins un thème&nbsp;: les besoins proposés dépendent des thèmes choisis.</p>
+        <details class="pub-liste" id="liste-besoins" hidden open>
+          <summary><span class="pub-liste__compte" id="compte-besoins"></span><span class="fr-icon-arrow-down-s-line pub-chevron" aria-hidden="true"></span></summary>
+          <div class="pub-liste__panneau" id="panneau-besoins"></div>
+        </details>
+      </section>
+
+      <section class="pub-bloc" id="resultats" aria-labelledby="t-resultats">
+        <span class="pub-etape">Étape 3 sur 3</span>
+        <h2 class="pub-bloc__titre fr-h4" id="t-resultats">Vos résultats</h2>
+        <div id="resume" role="status" aria-live="polite"></div>
+        <div id="resultats-corps"></div>
+      </section>
+
+      <section class="pub-aide" aria-labelledby="t-aide">
+        <h2 class="fr-h4" id="t-aide">Aidez-nous à compléter ce recensement</h2>
+        <div class="fr-grid-row fr-grid-row--gutters">
+          <div class="fr-col-12 fr-col-md-6">
+            <div class="fr-callout pub-encart">
+              <h3 class="fr-callout__title fr-h6">Vous n’avez pas trouvé votre financement&#8239;?</h3>
+              <p class="fr-callout__text">Décrivez votre projet et votre besoin&nbsp;: la DIRM Sud-Atlantique s’en servira pour compléter le recensement et pourra vous orienter.</p>
+              <button type="button" class="fr-btn" id="btn-demande">Signaler votre besoin</button>
+            </div>
+          </div>
+          <div class="fr-col-12 fr-col-md-6">
+            <div class="fr-callout pub-encart">
+              <h3 class="fr-callout__title fr-h6">Vous êtes financeur et n’êtes pas visible&#8239;?</h3>
+              <p class="fr-callout__text">Présentez votre dispositif ou votre appel à projets&nbsp;: après vérification, il pourra être ajouté à la liste des financements.</p>
+              <button type="button" class="fr-btn" id="btn-financeur">Proposer votre dispositif</button>
+            </div>
+          </div>
+        </div>
+        <p class="pub-contact" id="contact"></p>
+      </section>
+    </div>
+
+    <div id="vue-formulaire" hidden></div>
+  </main>
+</div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

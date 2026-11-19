@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestion du guide des financements – DIRM Sud-Atlantique</title>
+<link rel="stylesheet" href="dsfr/core/core.min.css">
+<link rel="stylesheet" href="dsfr/component/button/button.min.css">
+<link rel="stylesheet" href="dsfr/component/link/link.min.css">
+<link rel="stylesheet" href="dsfr/component/badge/badge.min.css">
+<link rel="stylesheet" href="dsfr/component/tag/tag.min.css">
+<link rel="stylesheet" href="dsfr/component/alert/alert.min.css">
+<link rel="stylesheet" href="dsfr/component/form/form.min.css">
+<link rel="stylesheet" href="dsfr/component/input/input.min.css">
+<link rel="stylesheet" href="dsfr/component/select/select.min.css">
+<link rel="stylesheet" href="dsfr/component/checkbox/checkbox.min.css">
+<link rel="stylesheet" href="dsfr/component/toggle/toggle.min.css">
+<link rel="stylesheet" href="css/gestion.css">
+</head>
+<body>
+
+<main class="fr-container w-page" id="contenu">
+  <h1 class="fr-h3">Gestion du guide des financements</h1>
+
+  <div id="erreurs" role="alert"></div>
+  <div id="messages" role="status" aria-live="polite"></div>
+
+  <div class="w-vues-barre">
+    <div class="w-vues" role="tablist" aria-label="Sections du widget">
+      <button type="button" class="w-onglet" role="tab" id="vue-fiches" data-vue="fiches" aria-controls="vue-panneau-fiches" aria-selected="true">Fiches par thème</button>
+      <button type="button" class="w-onglet" role="tab" id="vue-maintenance" data-vue="maintenance" aria-controls="vue-panneau-maintenance" aria-selected="false" tabindex="-1">Maintenance</button>
+    </div>
+    <button type="button" class="fr-btn fr-btn--secondary fr-btn--sm" id="btn-recharger">Recharger les données</button>
+  </div>
+
+  <div id="vue-panneau-fiches" role="tabpanel" aria-labelledby="vue-fiches">
+    <div class="w-barre">
+      <div class="fr-select-group">
+        <label class="fr-label" for="choix-theme">Thème (une fiche par thème)</label>
+        <select class="fr-select" id="choix-theme"></select>
+      </div>
+      <button type="button" class="fr-btn fr-btn--sm" data-action="creer" data-table="Themes" data-id="0" data-cle="creer-Themes-0">Ajouter un thème</button>
+    </div>
+
+    <p id="chargement" role="status">Connexion à Grist…</p>
+    <div id="fiche" hidden></div>
+  </div>
+
+  <div id="vue-panneau-maintenance" role="tabpanel" aria-labelledby="vue-maintenance" hidden>
+    <div id="maintenance"></div>
+  </div>
+</main>
+
+<dialog id="dialogue" class="w-dialogue" aria-labelledby="dialogue-titre">
+  <form id="formulaire" novalidate>
+    <h2 class="fr-h5" id="dialogue-titre">Modification</h2>
+    <div id="dialogue-info"></div>
+    <div id="dialogue-champs"></div>
+    <p id="dialogue-erreur" class="fr-error-text" role="alert" hidden></p>
+    <div class="w-boutons">
+      <button type="submit" class="fr-btn" id="dialogue-valider">Enregistrer</button>
+      <button type="button" class="fr-btn fr-btn--secondary" id="dialogue-annuler">Annuler</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="ajout" class="w-dialogue" aria-labelledby="ajout-titre">
+  <form id="ajout-formulaire" novalidate>
+    <h2 class="fr-h5" id="ajout-titre" tabindex="-1">Ajouter une ligne au panorama</h2>
+    <div id="ajout-contenu"></div>
+    <p id="ajout-erreur" class="fr-error-text" role="alert" hidden></p>
+    <div class="w-boutons" id="ajout-boutons"></div>
+  </form>
+</dialog>
+
+<dialog id="confirmation" class="w-dialogue w-dialogue--petit" aria-labelledby="confirmation-titre">
+  <h2 class="fr-h5" id="confirmation-titre">Confirmation</h2>
+  <div id="confirmation-message"></div>
+  <div class="w-boutons">
+    <button type="button" class="fr-btn" id="confirmation-oui">Désactiver</button>
+    <button type="button" class="fr-btn fr-btn--secondary" id="confirmation-non">Annuler</button>
+  </div>
+</dialog>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

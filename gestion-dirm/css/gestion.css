@@ -1,0 +1,677 @@
+/* ==========================================================================
+   Widget de gestion : mise en page propre au widget. Les fichiers du DSFR ne sont pas modifiés.
+   Couleurs : variables du DSFR. Points de rupture en em : 48em (tablette).
+   ========================================================================== */
+
+/* ==========================
+   OUTILS
+   ========================== */
+.w-vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip-path: inset(50%);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.w-vide {
+  color: var(--text-mention-grey);
+}
+
+.w-meta {
+  margin: 0.25rem 0 0;
+  color: var(--text-mention-grey);
+}
+
+.w-requis {
+  font-weight: 400;
+}
+
+/* ==========================
+   PAGE
+   ========================== */
+.w-page {
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+.w-barre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.w-barre .fr-select-group {
+  flex: 1 1 22rem;
+  margin-bottom: 0;
+}
+
+#messages,
+#erreurs {
+  margin-bottom: 1rem;
+}
+
+.w-entete-fiche {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.w-entete-fiche__titre {
+  flex: 1 1 24rem;
+  min-width: 0;
+}
+
+.w-entete-fiche__titre .w-meta {
+  margin-top: 0.5rem;
+}
+
+.w-entete-fiche h2 {
+  margin: 0;
+}
+
+/* ==========================
+   PARTIES DE LA FICHE
+   ========================== */
+.w-partie {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--border-plain-grey);
+}
+
+.w-partie > h3 {
+  margin-bottom: 1rem;
+}
+
+.w-bloc {
+  max-width: 60rem;
+  margin-bottom: 1.5rem;
+}
+
+.w-liste {
+  margin: 0 0 1rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.w-ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-default-grey);
+}
+
+.w-ligne--haut {
+  align-items: flex-start;
+}
+
+.w-ligne__texte {
+  flex: 1 1 24rem;
+}
+
+.w-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin: 0.5rem 0 0;
+}
+
+.w-ligne .w-actions {
+  margin-top: 0;
+}
+
+.w-etat > * {
+  margin-bottom: 0.5rem;
+}
+
+.w-details {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+}
+
+.w-details summary {
+  cursor: pointer;
+  color: var(--text-action-high-blue-france);
+}
+
+.w-nom {
+  font-weight: 700;
+}
+
+.w-nom .fr-tags-group {
+  margin-top: 0.5rem;
+  font-weight: 400;
+}
+
+/* Rubriques : libellé à gauche, texte à droite, pour raccourcir les fiches longues */
+.w-lig__detail > .w-meta {
+  margin: 0 0 1rem;
+}
+
+.w-def {
+  display: grid;
+  padding: 0;
+  grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr);
+  gap: 0.5rem 1.5rem;
+  margin: 0 0 1.5rem;
+}
+
+.w-def dt {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-title-grey);
+}
+
+.w-def dd {
+  margin: 0;
+}
+
+.w-def dd p,
+.w-def dd ul {
+  margin-bottom: 0.5rem;
+}
+
+.w-def dd > :last-child {
+  margin-bottom: 0;
+}
+
+/* ==========================
+   FENÊTRES (formulaires)
+   ========================== */
+.w-dialogue {
+  width: min(48rem, calc(100% - 2rem));
+  max-height: calc(100% - 2rem);
+  padding: 1.5rem;
+  overflow-y: auto;
+  border: 1px solid var(--border-default-grey);
+  background-color: var(--background-default-grey);
+  color: var(--text-default-grey);
+}
+
+.w-dialogue--petit {
+  width: min(32rem, calc(100% - 2rem));
+}
+
+.w-dialogue::backdrop {
+  background-color: rgb(22 22 22 / 64%); /* voile du composant « fenêtre modale » du DSFR */
+}
+
+.w-boutons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.w-fieldset {
+  min-width: 0;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  border: 0;
+}
+
+.w-cases {
+  max-height: 14rem;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-default-grey);
+}
+
+#dialogue-info {
+  margin-bottom: 1rem;
+}
+
+/* ==========================
+   FOCUS (couleur de focus du DSFR)
+   ========================== */
+.w-details summary:focus-visible,
+.w-page button:focus-visible {
+  outline: 2px solid #0a76f6;
+  outline-offset: 2px;
+}
+
+/* ==========================
+   MOBILE
+   ========================== */
+@media (max-width: 47.99em) {
+  .w-partie {
+    margin-top: 2rem;
+  }
+
+  .w-def {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
+  }
+
+  .w-def dd {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* ==========================
+   AJOUT D'UNE LIGNE (recherche d'un financement)
+   ========================== */
+#ajout-resultats {
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+#ajout-similaires ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1rem;
+}
+
+/* ==========================
+   ONGLETS DES PARTIES
+   ========================== */
+.w-onglets {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border-default-grey);
+}
+
+.w-onglet {
+  flex: 0 0 auto;
+  margin: 0 0 -1px;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--text-default-grey);
+  font: inherit;
+  cursor: pointer;
+}
+
+.w-onglet:hover {
+  background-color: var(--background-default-grey-hover);
+}
+
+.w-onglet[aria-selected="true"] {
+  border-bottom-color: var(--border-active-blue-france);
+  color: var(--text-active-blue-france);
+  font-weight: 700;
+}
+
+.w-onglet__n {
+  margin-left: 0.5rem;
+  color: var(--text-mention-grey);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.w-onglet:focus-visible,
+.w-panneau:focus-visible {
+  outline: 2px solid #0a76f6;
+  outline-offset: 2px;
+}
+
+.w-panneau > .w-partie {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* ==========================
+   INTERRUPTEUR (remplace le composant DSFR, trop haut pour une ligne de gestion)
+   ========================== */
+.w-sw {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  cursor: pointer;
+}
+
+.w-sw__input {
+  appearance: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.5rem;
+  height: 1.5rem;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.w-sw__piste {
+  position: relative;
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--border-action-high-blue-france);
+  border-radius: 0.75rem;
+}
+
+.w-sw__piste::after {
+  content: "";
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: var(--border-action-high-blue-france);
+  transition: transform 0.15s;
+}
+
+.w-sw__input:checked + .w-sw__piste {
+  background-color: var(--background-action-high-blue-france);
+}
+
+.w-sw__input:checked + .w-sw__piste::after {
+  background-color: #fff;
+  transform: translateX(1rem);
+}
+
+.w-sw__input:focus-visible + .w-sw__piste {
+  outline: 2px solid #0a76f6;
+  outline-offset: 2px;
+}
+
+.w-sw--occupe {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .w-sw__piste::after {
+    transition: none;
+  }
+}
+
+/* ==========================
+   MENU « PLUS D'ACTIONS »
+   ========================== */
+.w-plus {
+  position: relative;
+  display: inline-block;
+}
+
+.w-plus > summary {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  cursor: pointer;
+}
+
+.w-plus > summary::-webkit-details-marker {
+  display: none;
+}
+
+.w-plus > summary::after {
+  content: "";
+  margin-left: 0.5rem;
+  border: 0.3rem solid transparent;
+  border-top-color: currentcolor;
+  border-bottom: 0;
+}
+
+.w-plus__liste {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 12rem;
+  margin-top: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border-default-grey);
+  background-color: var(--background-default-grey);
+  box-shadow: 0 6px 18px 0 rgb(0 0 18 / 16%);
+}
+
+.w-ligne .w-plus__liste {
+  right: 0;
+  left: auto;
+}
+
+.w-plus__liste .fr-btn {
+  justify-content: flex-start;
+  width: 100%;
+  box-shadow: none;
+}
+
+/* ==========================
+   LIGNES REPLIABLES (panorama, appels, montage)
+   ========================== */
+.w-lignes {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.w-lig {
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border-default-grey);
+  background-color: var(--background-default-grey);
+}
+
+.w-lig__tete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding-right: 0.75rem;
+}
+
+.w-lig__titre {
+  display: flex;
+  flex: 1 1 18rem;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.w-lig__titre:hover {
+  background-color: var(--background-default-grey-hover);
+}
+
+.w-lig__titre:focus-visible {
+  outline: 2px solid #0a76f6;
+  outline-offset: -2px;
+}
+
+.w-lig__chevron {
+  flex: 0 0 auto;
+  margin-top: 0.4rem;
+  border-top: 0.3rem solid transparent;
+  border-bottom: 0.3rem solid transparent;
+  border-left: 0.45rem solid currentcolor;
+}
+
+.w-lig__titre[aria-expanded="true"] .w-lig__chevron {
+  transform: rotate(90deg);
+}
+
+.w-lig__nom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.w-lig__meta {
+  color: var(--text-mention-grey);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.w-lig__etat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.w-lig__etat .fr-badge {
+  margin: 0;
+}
+
+.w-lig__detail {
+  padding: 1.75rem 2.5rem 2rem;
+  border-top: 1px solid var(--border-default-grey);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .w-lig__chevron {
+    transition: transform 0.15s;
+  }
+}
+
+.w-panneau h4 {
+  margin: 2rem 0 0.75rem;
+}
+
+.w-panneau h4:first-of-type {
+  margin-top: 1rem;
+}
+
+.w-lignes + .w-actions {
+  margin-top: 1rem;
+}
+
+/* ==========================
+   BOUTONS D'UNE RANGÉE : même hauteur pour tous, « Plus d'actions » compris
+   ========================== */
+.w-actions .fr-btn,
+.w-actions .w-plus > summary {
+  box-sizing: border-box;
+  height: 2.5rem;
+  min-height: 2.5rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 1.5rem;
+}
+
+/* ==========================
+   NAVIGATION PRINCIPALE ET MAINTENANCE
+   ========================== */
+.w-vues-barre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-default-grey);
+}
+
+.w-vues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.w-vues .w-onglet {
+  font-size: 1.125rem;
+}
+
+.w-vues-barre > .fr-btn {
+  margin-bottom: 0.5rem;
+}
+
+.w-filtres {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.w-filtres .fr-input-group,
+.w-filtres .fr-select-group {
+  flex: 1 1 14rem;
+  margin-bottom: 0;
+}
+
+.w-filtres .fr-checkbox-group {
+  margin-bottom: 0;
+}
+
+/* ==========================
+   LISTES DE CASES GROUPÉES (financements cités par organisme)
+   ========================== */
+.w-cases--hautes {
+  max-height: 20rem;
+}
+
+.w-groupe + .w-groupe {
+  margin-top: 0.75rem;
+}
+
+.w-groupe__titre {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+  color: var(--text-title-grey);
+}
+
+/* ==========================
+   « PLUS D'INFORMATIONS » (champs facultatifs repliés)
+   ========================== */
+.w-infos {
+  margin: 0 0 1.5rem;
+  border: 1px solid var(--border-default-grey);
+}
+
+.w-infos > summary {
+  padding: 0.75rem 1rem;
+  color: var(--text-action-high-blue-france);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.w-infos > summary:focus-visible {
+  outline: 2px solid #0a76f6;
+  outline-offset: -2px;
+}
+
+.w-infos__contenu {
+  padding: 0.5rem 1rem 0;
+}
+
+/* ==========================
+   ACTIONS SUR TOUTE LA FICHE (en-tête)
+   ========================== */
+.w-entete-fiche__etat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+}
+
+.w-entete-fiche .w-plus__liste {
+  right: 0;
+  left: auto;
+  min-width: 18rem;
+}
