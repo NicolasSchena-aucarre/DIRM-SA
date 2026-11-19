@@ -2,7 +2,7 @@
 export const CONFIG = {
   // Script « API plugin » de Grist. À remplacer par celui de votre instance,
   // par exemple "https://grist.exemple.gouv.fr/grist-plugin-api.js".
-  scriptApiGrist: "https://docs.getgrist.com/grist-plugin-api.js",
+  scriptApiGrist: "https://grist.aucarre.tech/grist-plugin-api.js",
 
   // Tables lues par le widget (identifiants Grist).
   tables: ["Themes", "Sous_themes", "Besoins", "Organismes", "Financements", "Panorama", "Fiches_detaillees", "Appels_a_projets", "Textes_communs"],
