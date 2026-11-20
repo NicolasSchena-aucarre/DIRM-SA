@@ -2,6 +2,19 @@
 
 const NBSP = "\u00a0";
 
+// Rubriques d’une fiche détaillée : colonne Grist et libellé affiché (ceux des fiches .docx).
+export const RUBRIQUES = [
+  ["Type_de_soutien", "Type de soutien"],
+  ["Beneficiaires", "Bénéficiaires"],
+  ["Depenses", "Dépenses"],
+  ["Comment_y_acceder", "Comment y accéder ?"],
+  ["Precision_calendrier", "Calendrier"],
+  ["Niveau_d_aide", "Niveau d’aide"],
+  ["Dans_quel_cas", "Dans quel cas le mobiliser ?"],
+  ["Point_de_vigilance", "Point de vigilance"],
+  ["Exemple_de_projet", "Exemple de projet financé"],
+];
+
 // Tableau « colonnes » de Grist (fetchTable) → liste de lignes.
 export function lignes(table) {
   if (!table || !Array.isArray(table.id)) return [];
@@ -84,6 +97,12 @@ export function construireModele(tables, aujourdhui = new Date(), seuilJours = 3
   const organismes = new Map((T.Organismes ?? []).map((o) => [o.id, texte(o.Nom)]));
   const financements = new Map((T.Financements ?? []).map((f) => [f.id, f]));
   const liensFiche = new Map((T.Fiches_detaillees ?? []).map((f) => [f.id, analyserLiens(f.Liens)]));
+  const fiches = new Map((T.Fiches_detaillees ?? []).map((f) => [f.id, {
+    titre: texte(f.Titre),
+    rubriques: RUBRIQUES.map(([cle, libelle]) => ({ libelle, texte: texte(f[cle]) })).filter((r) => r.texte),
+    liens: liensFiche.get(f.id) ?? [],
+  }]));
+  const sousThemes = new Map((T.Sous_themes ?? []).map((s) => [s.id, { titre: texte(s.Titre), ordre: s.Ordre ?? 0 }]));
 
   const lignesPanorama = (T.Panorama ?? [])
     .filter((p) => p.Visible && idsThemes.has(ref(p.Theme)))
@@ -92,11 +111,31 @@ export function construireModele(tables, aujourdhui = new Date(), seuilJours = 3
       theme: ref(p.Theme),
       ordreSousTheme: ordreSousTheme.get(ref(p.Sous_theme)) ?? 0,
       ordre: p.Ordre ?? 0,
+      sousTheme: ref(p.Sous_theme),
+      aUtiliser: texte(p.A_utiliser_pour),
+      fonctionnement: texte(p.Fonctionnement),
+      acces: texte(p.Acces),
+      fiche: fiches.get(ref(p.Fiche_detaillee)) ?? null,
       nom: texte(p.Dispositif) || libelleFinancement(financements.get(ref(p.Financement)), organismes, masques) || texte(p.Nom_affiche),
       besoins: liste(p.Besoins),
       liens: liensFiche.get(ref(p.Fiche_detaillee)) ?? [],
     }))
     .sort((a, b) => a.ordreSousTheme - b.ordreSousTheme || a.ordre - b.ordre || a.id - b.id);
+
+  // Besoins d’un appel (règle B) : ceux des lignes du panorama qui ont le même financement que l’appel,
+  // dans les thèmes où l’appel figure. La colonne « Besoins » enregistrée dans les appels n’est plus lue.
+  const besoinsParFinancementEtTheme = new Map();
+  for (const p of T.Panorama ?? []) {
+    const cle = `${ref(p.Financement)}:${ref(p.Theme)}`;
+    const ensemble = besoinsParFinancementEtTheme.get(cle) ?? new Set();
+    liste(p.Besoins).forEach((b) => ensemble.add(b));
+    besoinsParFinancementEtTheme.set(cle, ensemble);
+  }
+  const besoinsDeduits = (financement, themesAppel) => {
+    if (!financement) return [];
+    const themesCibles = themesAppel.length ? themesAppel : [...idsThemes];
+    return [...new Set(themesCibles.flatMap((t) => [...(besoinsParFinancementEtTheme.get(`${financement}:${t}`) ?? [])]))];
+  };
 
   const appels = (T.Appels_a_projets ?? [])
     .filter((a) => a.Visible)
@@ -106,14 +145,19 @@ export function construireModele(tables, aujourdhui = new Date(), seuilJours = 3
       lien: /^https?:\/\//.test(texte(a.Lien)) ? texte(a.Lien) : "",
       financeur: libelleFinancement(financements.get(ref(a.Financement)), organismes, masques),
       themes: liste(a.Themes),
-      besoins: liste(a.Besoins),
+      besoins: besoinsDeduits(ref(a.Financement), liste(a.Themes)),
       statut: texte(a.Statut) || statutAppel(a, aujourdhui, seuilJours),
       ouverture: a.Ouverture || 0,
       cloture: a.Cloture || 0,
       heure: texte(a.Heure_cloture),
     }));
 
-  return { themes, themesTotal: (T.Themes ?? []).length, besoinsParTheme, lignes: lignesPanorama, appels, textes };
+  const montage = (T.Montage_financier ?? [])
+    .filter((q) => q.Visible && idsThemes.has(ref(q.Theme)))
+    .sort(parOrdre)
+    .map((q) => ({ id: q.id, theme: ref(q.Theme), question: texte(q.Question), reponse: texte(q.Reponse) }));
+
+  return { themes, themesTotal: (T.Themes ?? []).length, besoinsParTheme, lignes: lignesPanorama, appels, montage, sousThemes, textes };
 }
 
 // ---------- Dates ----------

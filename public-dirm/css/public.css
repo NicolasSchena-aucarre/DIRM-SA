@@ -4,6 +4,7 @@
 .fr-icon-arrow-down-s-line::before, .fr-icon-arrow-down-s-line::after { -webkit-mask-image: url(../dsfr/icons/arrows/arrow-down-s-line.svg); mask-image: url(../dsfr/icons/arrows/arrow-down-s-line.svg); }
 .fr-icon-arrow-left-line::before, .fr-icon-arrow-left-line::after { -webkit-mask-image: url(../dsfr/icons/arrows/arrow-left-line.svg); mask-image: url(../dsfr/icons/arrows/arrow-left-line.svg); }
 .fr-icon-external-link-line::before, .fr-icon-external-link-line::after { -webkit-mask-image: url(../dsfr/icons/system/external-link-line.svg); mask-image: url(../dsfr/icons/system/external-link-line.svg); }
+.fr-icon-download-line::before, .fr-icon-download-line::after { -webkit-mask-image: url(../dsfr/icons/system/download-line.svg); mask-image: url(../dsfr/icons/system/download-line.svg); }
 .fr-icon-information-line::before, .fr-icon-information-line::after { -webkit-mask-image: url(../dsfr/icons/system/information-line.svg); mask-image: url(../dsfr/icons/system/information-line.svg); }
 
 /* BASE */
@@ -84,6 +85,19 @@
 .pub-vide h3 { margin: 0 0 8px; }
 .pub-vide p { margin: 0; }
 
+/* PDF : bouton et fenêtre d’aperçu */
+.pub-pdf { margin: 8px 0 8px; }
+.pub-pdf .pub-aide-texte { margin: 8px 0 0; }
+.pub-dialog { width: min(64rem, calc(100% - 2rem)); max-height: calc(100% - 2rem); padding: 0; border: 1px solid var(--border-default-grey); background: var(--background-default-grey); color: var(--text-default-grey); }
+.pub-dialog::backdrop { background: rgba(22, 22, 22, .64); }
+.pub-dialog__contenu { display: flex; flex-direction: column; gap: 12px; padding: 24px; max-height: calc(100vh - 2rem); overflow: auto; }
+.pub-dialog__tete { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.pub-dialog__tete h2 { margin: 0; }
+.pub-dialog__boutons { display: flex; gap: 16px; flex-wrap: wrap; }
+.pub-apercu { width: 100%; height: min(60vh, 40rem); border: 1px solid var(--border-default-grey); background: var(--background-alt-grey); }
+#dlg-pdf-etat { font-weight: 700; }
+#dlg-pdf-corps p { margin: 0 0 8px; }
+
 /* ENCARTS DU BAS DE PAGE */
 .pub-aide { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--border-default-grey); }
 .pub-aide h2 { margin: 0 0 16px; }
@@ -111,6 +125,7 @@
 
 /* IMPRESSION : résultats uniquement */
 @media print {
+  .pub-pdf, .pub-dialog,
   .pub-liste, .pub-aide, .pub-presentations, .pub-tags, #vue-formulaire, .pub-bloc:nth-of-type(-n+2) .pub-aide-texte { display: none !important; }
   .pub-bloc:nth-of-type(-n+2) { display: none; }
   .pub-etape, .pub-chapo { display: none !important; }

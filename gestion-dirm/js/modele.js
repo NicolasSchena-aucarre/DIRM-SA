@@ -153,11 +153,10 @@ export function fiche(M, themeId) {
   const theme = M.Themes.get(themeId);
   const sousThemes = trier(tous("Sous_themes").filter((s) => s.Theme === themeId));
   const besoins = trier(tous("Besoins").filter((b) => b.Theme === themeId));
-  const idsBesoins = new Set(besoins.map((b) => b.id));
   const panorama = tous("Panorama").filter((p) => p.Theme === themeId);
   const parSousTheme = new Map(sousThemes.map((s) => [s.id, trier(panorama.filter((p) => p.Sous_theme === s.id))]));
   const sansSousTheme = trier(panorama.filter((p) => !parSousTheme.has(p.Sous_theme)));
-  const appels = tous("Appels_a_projets").filter((a) => a.Themes.includes(themeId) || a.Besoins.some((b) => idsBesoins.has(b)));
+  const appels = tous("Appels_a_projets").filter((a) => a.Themes.includes(themeId));
   // Fiches détaillées désignées par les lignes de ce thème, dans l'ordre du panorama.
   const ordrePanorama = [...parSousTheme.values()].flat().concat(sansSousTheme);
   const fichesIds = [];
@@ -293,7 +292,7 @@ export function impactSuppression(M, table, id) {
   if (table === "Fiches_detaillees") return { lignes: tous("Panorama").filter((x) => x.Fiche_detaillee === id) };
   if (table === "Besoins") {
     const lignes = tous("Panorama").filter((x) => x.Besoins.includes(id));
-    return { lignes, appels: tous("Appels_a_projets").filter((a) => a.Besoins.includes(id)), lignesSansBesoin: lignes.filter((x) => x.Besoins.length === 1) };
+    return { lignes, appels: [], lignesSansBesoin: lignes.filter((x) => x.Besoins.length === 1) };
   }
   if (table === "Financements") return usagesFinancement(M, id);
   if (table === "Organismes") return { financements: tous("Financements").filter((f) => f.Organisme === id) };
@@ -322,7 +321,6 @@ export function actionsSuppression(M, table, id, { avecFiche = false } = {}) {
   }
   if (table === "Besoins") {
     if (imp.lignes.length) actions.push(["BulkUpdateRecord", "Panorama", imp.lignes.map((x) => x.id), { Besoins: imp.lignes.map((x) => sansElement(x.Besoins, id)) }]);
-    if (imp.appels.length) actions.push(["BulkUpdateRecord", "Appels_a_projets", imp.appels.map((x) => x.id), { Besoins: imp.appels.map((x) => sansElement(x.Besoins, id)) }]);
   }
   actions.push(["RemoveRecord", table, id]);
   if (table === "Panorama" && avecFiche && imp.ficheOrpheline) actions.push(["RemoveRecord", "Fiches_detaillees", imp.ficheOrpheline.id]);
@@ -352,9 +350,21 @@ export function doublonsFinancements(M) {
   return new Set([...groupes.values()].filter((g) => g.length > 1).flat());
 }
 
-/** Un appel appartient à un thème s'il le cite ou s'il est lié à l'un de ses besoins (même règle que la fiche d'un thème). */
+/** Un appel appartient à un thème quand il le cite : c'est ainsi que les fiches du client le rattachent. */
 export function appelDuTheme(M, a, themeId) {
-  return a.Themes.includes(themeId) || a.Besoins.some((b) => M.Besoins.get(b)?.Theme === themeId);
+  return a.Themes.includes(themeId);
+}
+
+/**
+ * Besoins d'un appel (règle B) : ceux des lignes du panorama qui ont le même financement que l'appel,
+ * dans les thèmes où l'appel figure. Rien n'est saisi à la main : la colonne « Besoins » des appels n'est plus utilisée.
+ */
+export function besoinsDeduitsAppel(M, a) {
+  if (!a.Financement) return [];
+  const themes = a.Themes.length ? new Set(a.Themes) : null;
+  const besoins = new Set();
+  for (const p of M.Panorama.values()) if (p.Financement === a.Financement && (!themes || themes.has(p.Theme))) p.Besoins.forEach((b) => besoins.add(b));
+  return [...besoins];
 }
 
 /* ---------- Actions sur toute une fiche (un thème) ---------- */
@@ -403,11 +413,10 @@ export function planSuppressionTheme(M, id) {
   const tous = (nom) => [...M[nom].values()];
   const sousThemes = tous("Sous_themes").filter((x) => x.Theme === id);
   const besoins = tous("Besoins").filter((x) => x.Theme === id);
-  const idsBesoins = new Set(besoins.map((b) => b.id));
   const lignes = tous("Panorama").filter((p) => p.Theme === id);
   const montage = tous("Montage_financier").filter((q) => q.Theme === id);
-  const lies = tous("Appels_a_projets").filter((a) => a.Themes.includes(id) || a.Besoins.some((b) => idsBesoins.has(b)));
-  const exclusif = (a) => a.Themes.every((t) => t === id) && a.Besoins.every((b) => idsBesoins.has(b));
+  const lies = tous("Appels_a_projets").filter((a) => a.Themes.includes(id));
+  const exclusif = (a) => a.Themes.every((t) => t === id);
   const appelsSupprimes = lies.filter(exclusif);
   const appelsDetaches = lies.filter((a) => !exclusif(a));
   const idsLignes = new Set(lignes.map((p) => p.id));
@@ -422,7 +431,7 @@ export function planSuppressionTheme(M, id) {
       "BulkUpdateRecord",
       "Appels_a_projets",
       appelsDetaches.map((a) => a.id),
-      { Themes: appelsDetaches.map((a) => liste(a.Themes.filter((t) => t !== id))), Besoins: appelsDetaches.map((a) => liste(a.Besoins.filter((b) => !idsBesoins.has(b)))) },
+      { Themes: appelsDetaches.map((a) => liste(a.Themes.filter((t) => t !== id))) },
     ]);
   }
   const retirer = (table, l) => {

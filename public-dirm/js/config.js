@@ -5,10 +5,15 @@ export const CONFIG = {
   scriptApiGrist: "https://docs.getgrist.com/grist-plugin-api.js",
 
   // Tables lues par le widget (identifiants Grist).
-  tables: ["Themes", "Sous_themes", "Besoins", "Organismes", "Financements", "Panorama", "Fiches_detaillees", "Appels_a_projets", "Textes_communs"],
+  tables: ["Themes", "Sous_themes", "Besoins", "Organismes", "Financements", "Panorama", "Fiches_detaillees", "Appels_a_projets", "Montage_financier", "Textes_communs"],
 
   // Tables où les deux formulaires du bas de page enregistrent leurs envois.
   tablesEnvoi: { demande: "Demandes_financement", financeur: "Propositions_financeurs" },
+
+  // Fabrication du PDF : bibliothèque et polices, chargées seulement quand l’usager demande le PDF.
+  // Ces deux fichiers sont hébergés avec le widget (dossier vendor/). Une adresse de CDN fonctionnerait aussi,
+  // mais chaque visiteur contacterait alors un serveur tiers.
+  pdf: { scriptPdfmake: "vendor/pdfmake.min.js", scriptPolices: "vendor/polices-marianne.js" },
 
   // Une clôture dans ce délai (en jours) donne le statut « Clôture proche ».
   seuilClotureJours: 30,

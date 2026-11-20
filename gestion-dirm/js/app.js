@@ -274,7 +274,7 @@ function htmlAlerteAnciens(anciens, aujourdhui, ancre) {
 /** Ligne repliable d’un appel. `idsBesoins` : dans la fiche d’un thème, on ne montre que les besoins de ce thème. */
 function ligneAppel(a, statut, aujourdhui, { cle, idsBesoins = null }) {
   const fin = modele.Financements.get(a.Financement);
-  const besoins = a.Besoins.filter((id) => !idsBesoins || idsBesoins.has(id)).map((id) => modele.Besoins.get(id)?.Libelle).filter(Boolean);
+  const besoins = mod.besoinsDeduitsAppel(modele, a).filter((id) => !idsBesoins || idsBesoins.has(id)).map((id) => modele.Besoins.get(id)?.Libelle).filter(Boolean);
   const themes = a.Themes.map((id) => modele.Themes.get(id)?.Code).filter(Boolean);
   const raisons = mod.raisonsAppel(a, modele);
   const ancien = mod.clotureAncienne(a, aujourdhui);
@@ -284,7 +284,7 @@ function ligneAppel(a, statut, aujourdhui, { cle, idsBesoins = null }) {
     `<p class="fr-text--sm">Ouverture : ${dateHtml(a.Ouverture)} · Clôture : ${dateHtml(a.Cloture)}${a.Heure_cloture ? ` · ${e(a.Heure_cloture)}` : ""}</p>` +
     (a.Lien ? `<p class="fr-text--sm">${lienExterne(a.Lien, "Page de l’appel")}</p>` : "") +
     (a.Texte ? md(a.Texte) : "") +
-    (besoins.length ? `<p class="fr-text--sm w-meta">${idsBesoins ? "Besoins liés dans ce thème" : "Besoins liés"} :</p>${etiquettes(besoins)}` : "") +
+    (besoins.length ? `<p class="fr-text--sm w-meta">${idsBesoins ? "Besoins concernés dans ce thème" : "Besoins concernés"} (déduits des lignes du panorama qui ont ce financement) :</p>${etiquettes(besoins)}` : "") +
     (themes.length ? `<p class="fr-text--sm w-meta">Thèmes : ${e(themes.join(", "))}</p>` : "") +
     raisonsHtml(raisons) +
     `<div class="w-actions">${bouton("editer", "Modifier", "Appels_a_projets", a.id, `« ${a.Nom} »`)}${menuPlus(a.Nom, bouton("supprimer", "Supprimer", "Appels_a_projets", a.id, `« ${a.Nom} »`))}</div>`;
@@ -682,7 +682,6 @@ const FORMULAIRES = {
       texte("Heure_cloture", "Heure limite", { aide: "Facultatif, par exemple « 14 h ».", replie: true }),
       texte("Lien", "Lien vers la page de l’appel", { url: true, aide: "Facultatif. Rend le nom de l’appel cliquable.", replie: true }),
       listeRefs("Themes", "Thèmes où l’appel figure", optionsDe("Themes", (t) => `${t.Code} · ${t.Nom}`), { replie: true, sansOuverture: true }),
-      listeRefs("Besoins", "Besoins auxquels il répond (thème affiché)", (l) => optionsDe("Besoins", (b) => b.Libelle, (b) => b.Theme === themeId)(l), { replie: true, sansOuverture: true }),
     ],
   },
   Montage_financier: {
@@ -1189,11 +1188,11 @@ async function enregistrerAjout(ev) {
 
 const CHAMPS_APPEL = FORMULAIRES.Appels_a_projets.champs.filter((f) => f.col !== "Financement");
 
-const appelVierge = () => ({ Nom: "", Themes: [themeId], Besoins: [], Lien: "", Ouverture: null, Cloture: null, Heure_cloture: "", Statut_particulier: "", Texte: "" });
+const appelVierge = () => ({ Nom: "", Themes: [themeId], Lien: "", Ouverture: null, Cloture: null, Heure_cloture: "", Statut_particulier: "", Texte: "" });
 
 function ouvrirAjoutAppel(declencheur) {
   ouvreur = declencheur;
-  ajout = { type: "appel", sousThemeId: 0, etape: "saisie", financementId: 0, cree: false, besoinsAuto: new Set(), financementAuto: 0 };
+  ajout = { type: "appel", sousThemeId: 0, etape: "saisie", financementId: 0, cree: false, financementAuto: 0 };
   $("dialogue-champs").innerHTML = "";
   const v = appelVierge();
   const champ = (col) => CHAMPS_APPEL.find((f) => f.col === col);
@@ -1207,7 +1206,7 @@ function ouvrirAjoutAppel(declencheur) {
   $("ajout-contenu").innerHTML =
     titreAjout() +
     (lignes.length
-      ? `<div class="fr-select-group"><label class="fr-label" for="ajout-ligne-appel">Ligne du panorama concernée<span class="fr-hint-text">Facultatif. Reprend le nom, le financement et les besoins de la ligne ; vous pouvez ensuite compléter le nom (par exemple « – 4e appel »).</span></label>` +
+      ? `<div class="fr-select-group"><label class="fr-label" for="ajout-ligne-appel">Ligne du panorama concernée<span class="fr-hint-text">Facultatif. Reprend le nom et le financement de la ligne ; vous pouvez ensuite compléter le nom (par exemple « – 4e appel »).</span></label>` +
         `<select class="fr-select" id="ajout-ligne-appel"><option value="0">Aucune : choisir le financement ci-dessous</option>${lignes.map(optionLigne).join("")}</select></div>`
       : "") +
     champHtml(champ("Nom"), v) +
@@ -1219,10 +1218,11 @@ function ouvrirAjoutAppel(declencheur) {
     `<button type="submit" class="fr-btn" id="ajout-valider">Ajouter l’appel</button>` +
     `<button type="button" class="fr-btn fr-btn--tertiary" data-ajout="annuler">Annuler</button>`;
   $("ajout-erreur").hidden = true;
+  majInfoBesoinsAppel();
   $("ajout").showModal();
 }
 
-/** Le choix d’une ligne remplit le nom, le financement et les besoins de l’appel (tout reste modifiable). */
+/** Le choix d’une ligne remplit le nom et le financement de l’appel (tout reste modifiable). */
 function majAppelLigne() {
   const p = modele.Panorama.get(Number($("ajout-ligne-appel").value));
   const champ = $("champ-Nom");
@@ -1239,31 +1239,22 @@ function majAppelLigne() {
     selection.value = "0"; // on n’efface le financement que s’il venait de la ligne
     ajout.financementAuto = 0;
   }
-  cocherBesoinsDuFinancement();
+  majInfoBesoinsAppel();
   majSimilairesAppel();
 }
 
-/** Les besoins se cochent d’après les lignes du panorama qui utilisent ce financement dans ce thème (modifiables). */
-function cocherBesoinsDuFinancement() {
+/** Les besoins d'un appel ne se saisissent pas : on indique sous quels besoins de ce thème il s'affichera (règle B). */
+function majInfoBesoinsAppel() {
   const id = Number($("champ-Financement").value) || 0;
-  const caseDe = (b) => document.getElementById(`champ-Besoins-${b}`);
-  for (const b of ajout.besoinsAuto) {
-    const c = caseDe(b);
-    if (c) c.checked = false;
+  const info = $("ajout-besoins-info");
+  if (!id) {
+    info.textContent = "Sans financement, l’appel ne peut pas être rattaché à des besoins : il s’affichera pour tout le thème.";
+    return;
   }
-  ajout.besoinsAuto = new Set();
-  if (id > 0) {
-    const suggeres = new Set(mod.lignesDuFinancementDansTheme(modele, id, themeId).flatMap((p) => p.Besoins));
-    for (const b of suggeres) {
-      const c = caseDe(b);
-      if (c && !c.checked) {
-        c.checked = true;
-        ajout.besoinsAuto.add(b);
-      }
-    }
-  }
-  const n = ajout.besoinsAuto.size;
-  $("ajout-besoins-info").textContent = n ? `${n} besoin${n > 1 ? "s" : ""} coché${n > 1 ? "s" : ""} d’après les lignes du panorama de ce financement dans ce thème. Vous pouvez les modifier.` : "";
+  const besoins = [...new Set(mod.lignesDuFinancementDansTheme(modele, id, themeId).flatMap((p) => p.Besoins))].map((b) => modele.Besoins.get(b)?.Libelle).filter(Boolean);
+  info.textContent = besoins.length
+    ? `Cet appel s’affichera sous ${besoins.length} besoin${besoins.length > 1 ? "s" : ""} de ce thème, d’après les lignes du panorama qui ont ce financement : ${besoins.join(" ; ")}.`
+    : "Aucune ligne du panorama de ce thème n’a ce financement : l’appel s’affichera pour tout le thème, sans filtre par besoin.";
 }
 
 function majSimilairesAppel() {
@@ -1312,8 +1303,7 @@ async function enregistrerAjoutAppel() {
     const a = identiques[0];
     erreurs.push(a.Themes.includes(themeId) ? `Cet appel existe déjà dans ce thème (« ${a.Nom} »).` : `Cet appel existe déjà (« ${a.Nom} ») : ajoutez-lui ce thème plutôt que de le recréer.`);
   }
-  const idsBesoins = new Set(mod.trier([...modele.Besoins.values()].filter((b) => b.Theme === themeId)).map((b) => b.id));
-  if (!v.Themes.includes(themeId) && !v.Besoins.some((b) => idsBesoins.has(b))) erreurs.push("Cochez le thème de cette fiche ou l’un de ses besoins : sinon l’appel ne figurerait pas dans cette fiche.");
+  if (!v.Themes.includes(themeId)) erreurs.push("Cochez le thème de cette fiche : sinon l’appel ne figurerait pas dans cette fiche.");
   const zoneErreur = $("ajout-erreur");
   if (erreurs.length) {
     zoneErreur.textContent = erreurs.join(" ");
@@ -1324,7 +1314,6 @@ async function enregistrerAjoutAppel() {
   const idFinancement = Number($("champ-Financement").value) || 0;
   if (idFinancement > 0) champs.Financement = idFinancement;
   if (v.Themes.length) champs.Themes = ["L", ...v.Themes];
-  if (v.Besoins.length) champs.Besoins = ["L", ...v.Besoins];
   if (v.Ouverture) champs.Ouverture = mod.epochDepuisJour(v.Ouverture);
   if (v.Cloture) champs.Cloture = mod.epochDepuisJour(v.Cloture);
   if (v.Statut_particulier) champs.Statut_particulier = v.Statut_particulier;
@@ -1516,7 +1505,7 @@ function brancherAjout() {
     if (cible.dataset?.picker) majChoixFinancement(cible.dataset.picker);
     if (cible.dataset?.picker || cible.dataset?.financement) {
       if (ajout.type === "ligne") majFormulaireLigne();
-      else if (ajout.type === "appel") cocherBesoinsDuFinancement();
+      else if (ajout.type === "appel") majInfoBesoinsAppel();
     } else if (ajout.type === "ligne" && cible.id === "champ-Organisme") {
       majSimilaires();
       majDispositifAuto();
@@ -1776,8 +1765,8 @@ async function supprimer(table, id, declencheur) {
     titre = "Supprimer ce besoin ?";
     fait = "Besoin supprimé.";
     html = `<p>Le besoin « ${e(l.Libelle)} » sera supprimé.</p>`;
-    if (imp.lignes.length || imp.appels.length) {
-      html += `<p>Il est retiré de ${imp.lignes.length} ligne${pluriel(imp.lignes.length, "", "s")} du panorama et de ${imp.appels.length} appel${pluriel(imp.appels.length, "", "s")}.</p>`;
+    if (imp.lignes.length) {
+      html += `<p>Il est retiré de ${imp.lignes.length} ligne${pluriel(imp.lignes.length, "", "s")} du panorama. Les appels à projets suivent automatiquement les lignes de leur financement.</p>`;
     }
     if (imp.lignesSansBesoin.length) {
       html += `<div class="fr-alert fr-alert--warning fr-alert--sm w-bloc"><p>${imp.lignesSansBesoin.length} ligne${pluriel(imp.lignesSansBesoin.length, "", "s")} du panorama n’${pluriel(imp.lignesSansBesoin.length, "aura", "auront")} plus aucun besoin et ne ${pluriel(imp.lignesSansBesoin.length, "sera", "seront")} plus proposée${pluriel(imp.lignesSansBesoin.length, "", "s")} par les besoins :</p>${liste(imp.lignesSansBesoin.map((p) => mod.nomAffiche(p, modele)))}</div>`;

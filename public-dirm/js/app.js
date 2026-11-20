@@ -204,6 +204,7 @@ function rendreResultats() {
   const resume = $("resume");
   const corps = $("resultats-corps");
   vider(corps);
+  $("zone-pdf").hidden = true;
   const dispo = besoinsDisponibles();
   if (!etat.themes.size) { resume.textContent = "Les résultats s’afficheront ici dès que vous aurez choisi un thème puis au moins un besoin."; return; }
   if (!dispo.some((b) => etat.besoins.has(b.id))) { resume.textContent = "Choisissez au moins un besoin pour afficher les financements et les appels à projets."; return; }
@@ -216,6 +217,7 @@ function rendreResultats() {
       h("p", {}, "Aucun financement ni appel à projets n’est recensé pour l’instant pour cette sélection. Essayez un autre besoin ou un autre thème, ou consultez les sites des financeurs régionaux et nationaux.")));
     return;
   }
+  $("zone-pdf").hidden = false;
   corps.append(h("p", { class: "pub-info" }, h("span", { class: "fr-icon-external-link-line", "aria-hidden": "true" }), " Les liens vers les sites des financeurs s’ouvrent dans un nouvel onglet."));
   corps.append(h("section", { class: "pub-section", "aria-labelledby": "t-financements" },
     h("h3", { class: "fr-h4", id: "t-financements" }, "Financements mobilisables"), r.blocs.map(blocTheme)));
@@ -265,6 +267,59 @@ function ouvrir(type, bouton) {
   window.scrollTo(0, 0);
 }
 
+// ---------- PDF ----------
+
+let urlPdf = null;
+let declencheurPdf = null;
+
+function libererPdf() {
+  if (urlPdf) URL.revokeObjectURL(urlPdf);
+  urlPdf = null;
+  $("dlg-pdf-apercu").removeAttribute("src");
+}
+
+function fermerPdf() {
+  const dlg = $("dlg-pdf");
+  if (typeof dlg.close === "function") dlg.close();
+  else {
+    dlg.removeAttribute("open");
+    surFermeturePdf();
+  }
+}
+
+function surFermeturePdf() {
+  libererPdf();
+  declencheurPdf?.focus();
+}
+
+async function ouvrirPdf(declencheur) {
+  declencheurPdf = declencheur;
+  const dlg = $("dlg-pdf");
+  const etatPdf = $("dlg-pdf-etat");
+  const lien = $("dlg-pdf-telecharger");
+  $("dlg-pdf-corps").hidden = true;
+  lien.hidden = true;
+  etatPdf.textContent = "Préparation du PDF en cours… cela peut prendre quelques secondes pour une grande sélection.";
+  if (typeof dlg.showModal === "function") dlg.showModal();
+  else dlg.setAttribute("open", "");
+  try {
+    const { genererPdf } = await import("./pdf.js");
+    const r = await genererPdf({ M, themesSel: etat.themes, besoinsSel: etat.besoins, aujourdhui: new Date(), config: CONFIG.pdf });
+    libererPdf();
+    urlPdf = URL.createObjectURL(r.blob);
+    $("dlg-pdf-message").textContent = `Ce document reprend votre sélection au ${r.date}. Les informations sont indicatives et non exhaustives${FINE}: vérifiez-les auprès des organismes gestionnaires avant toute démarche. Document de ${r.libelle}.`;
+    $("dlg-pdf-apercu").src = urlPdf;
+    lien.href = urlPdf;
+    lien.download = r.nom;
+    etatPdf.textContent = `Le PDF est prêt (${r.libelle}).`;
+    $("dlg-pdf-corps").hidden = false;
+    lien.hidden = false;
+  } catch (err) {
+    console.error(err);
+    etatPdf.textContent = "Le PDF n’a pas pu être préparé. Fermez cette fenêtre et réessayez ; si le problème persiste, contactez la DIRM.";
+  }
+}
+
 // ---------- Démarrage ----------
 
 async function demarrer() {
@@ -283,6 +338,10 @@ async function demarrer() {
   majSelection();
   $("btn-demande").addEventListener("click", (e) => ouvrir("demande", e.currentTarget));
   $("btn-financeur").addEventListener("click", (e) => ouvrir("financeur", e.currentTarget));
+  $("btn-pdf").addEventListener("click", (e) => ouvrirPdf(e.currentTarget));
+  $("dlg-pdf-x").addEventListener("click", fermerPdf);
+  $("dlg-pdf-fermer").addEventListener("click", fermerPdf);
+  $("dlg-pdf").addEventListener("close", surFermeturePdf);
 }
 
 demarrer();
