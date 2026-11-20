@@ -18,7 +18,9 @@
 /* EN-TÊTE (logos) */
 .pub-entete { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
 .pub-logo { display: block; max-width: 100%; height: auto; }
-.pub-logo--marianne { width: 178px; }
+.pub-marque { display: flex; flex-direction: column; gap: 8px; }
+.pub-logo--marianne { width: 110px; }
+.pub-republique { margin: 0; color: #000; font-size: 1.3125rem; font-weight: 700; letter-spacing: -.01em; line-height: 1.03; text-transform: uppercase; }
 .pub-logo--dsf { width: 240px; }
 
 /* TITRE, CHAPÔ, AVERTISSEMENT */
@@ -72,7 +74,7 @@
 @media (max-width: 47.99em) { .pub-table--financements th[scope=row] { width: 40%; } }
 .pub-financeurs, .pub-liens { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .pub-financeurs > li, .pub-liens > li { padding: 0; }
-.pub-liens { margin: 4px 0 0 16px; font-size: .875rem; line-height: 1.5rem; }
+.pub-liens { margin: 4px 0 8px 4px; padding-left: 12px; border-left: 2px solid var(--border-default-grey); font-size: .875rem; line-height: 1.5rem; }
 .pub-financeur { display: block; font-size: .875rem; line-height: 1.5rem; color: var(--text-mention-grey); font-weight: 400; }
 .pub-delai { display: block; font-size: .875rem; line-height: 1.5rem; color: var(--text-mention-grey); }
 .pub-table .fr-table__content table tbody tr.pub-ligne-close td, .pub-table .fr-table__content table tbody tr.pub-ligne-close th { color: var(--text-mention-grey); background-color: var(--background-contrast-grey); }
@@ -101,7 +103,8 @@
 /* PETITS ÉCRANS */
 @media (max-width: 36em) {
   .pub { padding: 16px 12px 32px; }
-  .pub-logo--marianne { width: 140px; }
+  .pub-logo--marianne { width: 88px; }
+  .pub-republique { font-size: 1.05rem; }
   .pub-logo--dsf { width: 180px; }
   .pub-liste__panneau { max-height: none; }
 }
