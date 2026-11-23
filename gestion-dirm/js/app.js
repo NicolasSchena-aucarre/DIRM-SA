@@ -550,7 +550,7 @@ function rendreMaintenance() {
       `<section aria-labelledby="mh-financements"><h3 class="fr-h5" id="mh-financements" tabindex="-1">Financements</h3>` +
       `<p class="fr-hint-text">Tous les financements, tous thèmes confondus. Masquer un financement le fait disparaître de tous les thèmes. Pour le rattacher à un thème, ajoutez une ligne dans le panorama de ce thème.</p>` +
       `<div class="w-filtres"><div class="fr-input-group"><label class="fr-label" for="mf-q">Rechercher</label><input class="fr-input" type="search" id="mf-q" autocomplete="off" value="${e(filtres.q)}"></div>` +
-      `<div class="fr-select-group"><label class="fr-label" for="mf-org">Organisme</label><select class="fr-select" id="mf-org">${option("", "Tous", filtres.org)}${option("0", "Sans organisme", filtres.org)}${orgs.map((o) => option(o.id, o.Nom || "(sans nom)", filtres.org)).join("")}</select></div></div>` +
+      `<div class="fr-select-group"><label class="fr-label" for="mf-org">Organisme</label><select class="fr-select" id="mf-org" name="filtre-organisme" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">${option("", "Tous", filtres.org)}${option("0", "Sans organisme", filtres.org)}${orgs.map((o) => option(o.id, o.Nom || "(sans nom)", filtres.org)).join("")}</select></div></div>` +
       `<p class="fr-text--sm w-meta" id="mf-compte" role="status" aria-live="polite"></p><div id="mf-liste"></div>` +
       `<div class="w-actions">${avecPrefixe("m-", () => boutonCreer("Financements", "Ajouter un financement"))}</div></section>`,
     appels:
@@ -782,7 +782,7 @@ function htmlChoixFinancement(f, id, v) {
   const optOrg = (valeur, texte) => `<option value="${valeur}"${orgInit === String(valeur) ? " selected" : ""}>${e(texte)}</option>`;
   return (
     `<fieldset class="w-fieldset"><legend class="fr-label">${e(f.label)}${requis}${aide}</legend>` +
-    `<div class="fr-select-group"><label class="fr-label" for="${id}-org">Organisme</label><select class="fr-select" id="${id}-org" data-picker="${f.col}">${optOrg("", "Tous les organismes")}${optOrg("0", "Sans organisme")}${orgs.map((o) => optOrg(o.id, o.Nom || "(sans nom)")).join("")}</select></div>` +
+    `<div class="fr-select-group"><label class="fr-label" for="${id}-org">Organisme</label><select class="fr-select" id="${id}-org" data-picker="${f.col}" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">${optOrg("", "Tous les organismes")}${optOrg("0", "Sans organisme")}${orgs.map((o) => optOrg(o.id, o.Nom || "(sans nom)")).join("")}</select></div>` +
     `<div class="fr-select-group"><label class="fr-label" for="${id}">Financement</label><select class="fr-select" id="${id}" data-financement="${f.col}" data-facultatif="${f.facultatif ? 1 : 0}" data-creer="${f.creerFinancement ? 1 : 0}">${htmlOptionsFinancements(orgInit, v, f)}</select></div></fieldset>`
   );
 }

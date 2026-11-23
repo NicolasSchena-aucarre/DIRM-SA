@@ -3,7 +3,7 @@ import { CONFIG } from "./config.js";
 import { h, $, vider, FINE } from "./dom.js";
 
 // Styles des formulaires : chargés à la première ouverture seulement (sobriété : ils ne servent pas aux résultats).
-const STYLES_FORMULAIRE = ["form", "input", "select", "radio"].map((n) => `dsfr/component/${n}/${n}.min.css`);
+const STYLES_FORMULAIRE = ["form", "input", "select"].map((n) => `dsfr/component/${n}/${n}.min.css`);
 function chargerStyles() {
   for (const href of STYLES_FORMULAIRE) {
     if (!document.querySelector(`link[href="${href}"]`)) document.head.append(h("link", { rel: "stylesheet", href }));
