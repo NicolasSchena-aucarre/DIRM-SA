@@ -684,3 +684,34 @@
    ========================== */
 details { cursor: default; }
 details > summary { cursor: pointer; }
+
+/* ==========================
+   LISTES DÉROULANTES (Chrome)
+   La fenêtre native d'une liste qui doit s'ouvrir vers le haut se referme aussitôt sous Chrome (Linux) : le relâchement du bouton
+   choisit un élément. Avec « appearance: base-select », Chrome dessine la liste dans la page (plus de fenêtre native) ; c'est toujours
+   un vrai <select> (clavier, lecteurs d'écran). Firefox ne reconnaît pas cette propriété et garde sa liste native.
+   ========================== */
+@supports (appearance: base-select) {
+  select.fr-select,
+  select.fr-select::picker(select) { appearance: base-select; }
+  select.fr-select::picker-icon { display: none; }
+  select.fr-select::picker(select) {
+    box-sizing: border-box;
+    max-height: min(22rem, 60vh);
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--border-default-grey);
+    background: var(--background-default-grey);
+    box-shadow: 0 6px 16px rgba(0, 0, 18, 0.16);
+  }
+  select.fr-select option {
+    padding: 0.5rem 1rem;
+    color: var(--text-default-grey);
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  select.fr-select option::checkmark { display: none; }
+  select.fr-select option:hover,
+  select.fr-select option:focus-visible { background: var(--background-default-grey-hover); }
+  select.fr-select option:checked { background: var(--background-contrast-blue-france); font-weight: 700; }
+}
