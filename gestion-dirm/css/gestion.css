@@ -286,6 +286,9 @@
   gap: 0.25rem;
   margin-bottom: 1.5rem;
   overflow-x: auto;
+  overflow-y: hidden;
+  /* L’onglet actif chevauche le trait du bas (marge de -1 px) : sans cette marge, il dépasse d’un pixel et fait apparaître une barre de défilement verticale au survol. */
+  padding-bottom: 1px;
   border-bottom: 1px solid var(--border-default-grey);
 }
 
@@ -675,3 +678,9 @@
   left: auto;
   min-width: 18rem;
 }
+
+/* ==========================
+   BLOCS DÉPLIABLES : le DSFR met le curseur « main » sur tout l’élément details ; on le limite au titre cliquable.
+   ========================== */
+details { cursor: default; }
+details > summary { cursor: pointer; }

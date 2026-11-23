@@ -8,6 +8,10 @@
 .fr-icon-information-line::before, .fr-icon-information-line::after { -webkit-mask-image: url(../dsfr/icons/system/information-line.svg); mask-image: url(../dsfr/icons/system/information-line.svg); }
 
 /* BASE */
+/* Le DSFR met le curseur « main » sur tout l’élément details : on le limite au titre cliquable. */
+.pub details { cursor: default; }
+.pub details > summary { cursor: pointer; }
+
 .pub { padding: 24px 16px 40px; max-width: 80rem; margin: 0 auto; }
 .pub *, .pub *::before, .pub *::after { box-sizing: border-box; }
 .pub h1, .pub h2, .pub h3, .pub h4 { color: var(--text-title-grey); }

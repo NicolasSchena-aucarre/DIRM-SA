@@ -184,8 +184,9 @@ export function ouvrirFormulaire(type, ctx) {
   const form = h("form", { novalidate: true, class: "pub-form", "aria-labelledby": `${prefixe}-titre` }, zoneAlerte, sections, blocConsent, piege,
     h("div", { class: "pub-form-boutons" }, bouton, annuler));
 
-  zone.append(h("p", { class: "pub-retour" }, retour), titre, h("p", { class: "pub-chapo" }, spec.chapo),
-    h("p", { class: "pub-aide-texte" }, "Tous les champs sont obligatoires, sauf mention contraire."), recap, form);
+  // `recap` est nul pour le formulaire financeur ou sans sélection : append(null) écrirait « null » dans la page.
+  zone.append(...[h("p", { class: "pub-retour" }, retour), titre, h("p", { class: "pub-chapo" }, spec.chapo),
+    h("p", { class: "pub-aide-texte" }, "Tous les champs sont obligatoires, sauf mention contraire."), recap, form].filter(Boolean));
 
   const champs = spec.sections.flatMap((s) => s.champs);
 
